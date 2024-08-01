@@ -39,6 +39,12 @@ const Home = () => {
       console.error("Error:", error);
     }
   };
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault(); // Prevent new line
+      handleSubmit(); // Call submit function
+    }
+  };
   return (
     <div>
       <header className="chat-header">CPAN226CHAT</header>
@@ -49,8 +55,9 @@ const Home = () => {
             messageHistory.map((messageItem, index) => (
               <ReactMarkdown
                 key={index}
-                id="messages"
+                // id="messages"
                 remarkPlugins={[remarkGfm]}
+                className="markdown"
               >
                 {messageItem}
               </ReactMarkdown>
@@ -60,13 +67,14 @@ const Home = () => {
           )}
         </div>
         <div className="input-container">
-          <input
-            type="text"
+          <textarea
             id="message"
             className="message-input"
             placeholder="Ask ChatGPT..."
             value={prompt}
             onChange={(event) => setPrompt(event.target.value)}
+            onKeyDown={handleKeyDown} // Handle key events
+            rows="2" // Adjust rows as needed
           />
           <button id="send" className="message-button" onClick={handleSubmit}>
             {/* <img */}
