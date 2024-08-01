@@ -3,10 +3,12 @@ import "./styles.css";
 import io from "socket.io-client";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import sendArrow from "../assets/sendarrow.png";
 
 const Home = () => {
   const [prompt, setPrompt] = useState("");
   const [messageHistory, setMessageHistory] = useState([]);
+
   const handleSubmit = async () => {
     setMessageHistory([...messageHistory, prompt]);
 
@@ -50,17 +52,18 @@ const Home = () => {
       <header className="chat-header">CPAN226CHAT</header>
       <div className="chat-container">
         <div id="messages-container">
-          <div id="messages">test1</div>
           {messageHistory.length > 0 ? (
             messageHistory.map((messageItem, index) => (
-              <ReactMarkdown
-                key={index}
-                // id="messages"
-                remarkPlugins={[remarkGfm]}
-                className="markdown"
-              >
-                {messageItem}
-              </ReactMarkdown>
+              <div id="messages">
+                <ReactMarkdown
+                  key={index}
+                  id="messages"
+                  remarkPlugins={[remarkGfm]}
+                >
+                  {messageItem}
+                </ReactMarkdown>
+              </div>
+
             ))
           ) : (
             <div>No messages yet.</div>
@@ -77,12 +80,7 @@ const Home = () => {
             rows="2" // Adjust rows as needed
           />
           <button id="send" className="message-button" onClick={handleSubmit}>
-            {/* <img */}
-            {/*   src="{{ url_for('static', filename='4414831.png') }}" */}
-            {/*   alt="Send" */}
-            {/*   className="send-icon" */}
-            {/* /> */}
-            enter
+            <img src={sendArrow} alt="Send" className="send-icon" />
           </button>
         </div>
       </div>
