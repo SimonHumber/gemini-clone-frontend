@@ -40,6 +40,7 @@ body {
   background: #212121;
   scrollbar-width: thin;
   scrollbar-color: rgba(79, 79, 79, 0.3) transparent;
+  width: 56vw;
 }
 
 /* single chat message div */
@@ -51,6 +52,7 @@ body {
   padding: 15px;
   border-radius: 5px;
   background: #121212;
+  text-align: left;
   /* border: 1px solid #ddd; */
 }
 
@@ -60,12 +62,15 @@ body {
   align-items: center;
   padding-top: 10px;
   border-top: 1px solid #a5a5a5;
+  width: 60vw;
+  /* background-color: yellow; */
   /* background: #b8d86d; */
 }
 
 .message-input {
   flex: 1;
-  padding: 12px;
+  padding: 10px;
+  padding-left: 20px;
   margin-right: 10px;
   background: #121212;
   color: #fbfbfb;
@@ -73,6 +78,8 @@ body {
   border-radius: 25px;
   font-size: 16px;
   box-shadow: none; /* Remove any shadow effects */
+  /* padding-top: 15px; */
+  /* padding-bottom: 15px; */
 }
 
 .message-button {

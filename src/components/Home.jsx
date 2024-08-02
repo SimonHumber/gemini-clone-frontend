@@ -63,7 +63,6 @@ const Home = () => {
                   {messageItem}
                 </ReactMarkdown>
               </div>
-
             ))
           ) : (
             <div>No messages yet.</div>
