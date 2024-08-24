@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./styles.css";
 import io from "socket.io-client";
 import ReactMarkdown from "react-markdown";
@@ -8,8 +8,9 @@ import sendArrow from "../assets/sendarrow.png";
 const Home = () => {
   const [prompt, setPrompt] = useState("");
   const [messageHistory, setMessageHistory] = useState([]);
+  const messagesEndRef = useRef(null); // Create a ref for scrolling
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     setMessageHistory([...messageHistory, prompt]);
 
     try {
@@ -47,6 +48,10 @@ const Home = () => {
       handleSubmit(); // Call submit function
     }
   };
+  useEffect(() => {
+    // Scroll to bottom whenever messageHistory changes
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messageHistory]);
   return (
     <div>
       <header className="chat-header">CPAN226CHAT</header>
@@ -67,6 +72,8 @@ const Home = () => {
           ) : (
             <div>No messages yet.</div>
           )}
+          {/*invisible div to scroll down to on new message*/}
+          <div ref={messagesEndRef} />
         </div>
         <div className="input-container">
           <textarea
@@ -77,8 +84,14 @@ const Home = () => {
             onChange={(event) => setPrompt(event.target.value)}
             onKeyDown={handleKeyDown} // Handle key events
             rows="2" // Adjust rows as needed
+            style={{ resize: "none" }} //remove resizing button on bottom right corner
           />
-          <button id="send" className="message-button" onClick={handleSubmit}>
+          <button
+            id="send"
+            className="message-button"
+            onClick={handleSubmit}
+            disabled={prompt === ""} //if textarea empty, cannot submit
+          >
             <img src={sendArrow} alt="Send" className="send-icon" />
           </button>
         </div>
