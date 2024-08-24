@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import "./styles.css";
 import io from "socket.io-client";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import sendArrow from "../assets/sendarrow.png";
+import CopyButton from "./CopyButton";
+import "./styles.css";
 
 const Home = () => {
   const [prompt, setPrompt] = useState("");
@@ -16,11 +17,11 @@ const Home = () => {
     try {
       // Create a Socket.IO connection
       const socket = io("http://localhost:8080");
+      setPrompt(""); //clear prompt after sending
 
       socket.on("connect", () => {
         console.log("Connected to server");
         socket.send(prompt); // Sending a prompt
-        setPrompt(""); //clear prompt after sending
       });
 
       socket.on("response", (data) => {
@@ -42,43 +43,59 @@ const Home = () => {
       console.error("Error:", error);
     }
   };
+
   const handleKeyDown = (event) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault(); // Prevent new line
       handleSubmit(); // Call submit function
     }
   };
+
   useEffect(() => {
     // Scroll to bottom whenever messageHistory changes
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messageHistory]);
+
   return (
-    <div>
-      <header className="chat-header">CPAN226CHAT</header>
-      <div className="chat-container">
-        <div id="messages-container">
+    <div className="font-sans bg-[#212121] flex flex-col items-center h-screen m-0">
+      {/* sidebar here */}
+      <div className="p-5 w-7/12 h-11/12 flex flex-col ">
+        <header className="w-full text-3xl text-[#dadada] mb-5 text-center pb-10 border-b border-gray-600 m-auto">
+          CPAN226CHAT
+        </header>
+        <div className="m-auto h-[70vh] w-full overflow-y-auto mb-2 text-[#d6d6d6] p-2 bg-[#212121]">
           {messageHistory.length > 0 ? (
             messageHistory.map((messageItem, index) => (
-              <div id="messages">
-                <ReactMarkdown
-                  key={index}
-                  id="messages"
-                  remarkPlugins={[remarkGfm]}
-                >
-                  {messageItem}
-                </ReactMarkdown>
-              </div>
+              <ReactMarkdown
+                key={index}
+                className="prose prose-invert mb-2 ml-auto mr-auto p-4 rounded-xl bg-[#121212] text-left"
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  pre({ children }) {
+                    //TODO put a title above codeblock
+                    return (
+                      <div className="relative rounded-xl">
+                        <pre>{children}</pre>
+                        <CopyButton
+                          text={children[0]?.props?.children?.[0] || ""}
+                        />
+                      </div>
+                    );
+                  },
+                }}
+              >
+                {messageItem}
+              </ReactMarkdown>
             ))
           ) : (
             <div>No messages yet.</div>
           )}
-          {/*invisible div to scroll down to on new message*/}
+          {/*TODO replace this empty div. invisible div to scroll down to on new message*/}
           <div ref={messagesEndRef} />
         </div>
-        <div className="input-container">
+        <div className="w-full m-auto flex items-center pt-2 border-t border-[#a5a5a5]">
           <textarea
-            id="message"
-            className="message-input"
+            className="w-full p-2 pl-5 mr-2 bg-[#121212] text-[#fbfbfb] text-xl rounded-full"
             placeholder="Ask ChatGPT..."
             value={prompt}
             onChange={(event) => setPrompt(event.target.value)}
@@ -88,11 +105,11 @@ const Home = () => {
           />
           <button
             id="send"
-            className="message-button"
+            className="cursor-pointer rounded bg-none border-none flex justify-center items-center p-1"
             onClick={handleSubmit}
             disabled={prompt === ""} //if textarea empty, cannot submit
           >
-            <img src={sendArrow} alt="Send" className="send-icon" />
+            <img src={sendArrow} alt="Send" className="w-5 h-5" />
           </button>
         </div>
       </div>
