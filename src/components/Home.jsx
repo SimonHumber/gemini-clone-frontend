@@ -14,7 +14,8 @@ const Home = () => {
 
   const handleSubmit = () => {
     console.log(prompt);
-    setMessageHistory([...messageHistory, prompt]);
+    var promptObject = { role: "user", parts: [prompt] };
+    setMessageHistory([...messageHistory, promptObject]);
 
     try {
       // Create a Socket.IO connection
@@ -23,13 +24,14 @@ const Home = () => {
 
       socket.on("connect", () => {
         console.log("Connected to server");
-        socket.send(prompt); // Sending a prompt
+        socket.send(promptObject); // Sending a prompt
       });
 
       //custom event, backend emits response
       socket.on("response", (data) => {
         console.log("Received:", data);
-        setMessageHistory((prevHistory) => [...prevHistory, data]); //append response to message history
+        var responseObject = { role: "model", parts: [data] };
+        setMessageHistory((prevHistory) => [...prevHistory, responseObject]); //append response to message history
         socket.close(); // Close the connection after receiving the response
       });
 
@@ -40,6 +42,7 @@ const Home = () => {
 
       //if backend is off, this will run
       socket.on("connect_error", (error) => {
+        socket.close();
         console.error(error);
       });
     } catch (error) {
@@ -61,31 +64,42 @@ const Home = () => {
 
   return (
     <div className="font-sans bg-[#212121] flex flex-col items-center h-screen m-0">
-      <div className="p-5gw-full md:w-8/12 lg:w-7/12 h-11/12 flex flex-col ">
-        <header className="w-full text-3xl text-[#dadada] mb-5 text-center pb-10 border-b border-gray-600 m-auto">
+      <div className="p-5gw-full md:w-8/12 lg:w-7/12 h-11/12 flex flex-col mt-3">
+        <header className="w-full text-3xl text-[#dadada] mb-5 text-center pb-5 border-b border-gray-600 m-auto">
           CPAN226CHAT
         </header>
-        <div className="m-auto h-[70vh] w-full overflow-y-auto mb-2 text-[#d6d6d6] p-2 bg-[#212121]">
+        <div className="m-auto h-[75vh] w-full overflow-y-auto mb-2 text-[#d6d6d6] p-2 bg-[#212121]">
           {messageHistory.length > 0 ? (
-            messageHistory.map((messageItem, index) => (
-              <ReactMarkdown
-                key={index}
-                className="prose prose-invert mb-2 ml-auto mr-auto p-4 rounded-xl bg-[#121212] text-left"
-                remarkPlugins={[remarkGfm, remarkBreaks]}
-                components={{
-                  pre({ children }) {
-                    //TODO put a title above codeblock
-                    return (
-                      <div className="relative rounded-xl">
-                        <pre>{children}</pre>
-                        <CopyButton text={children.props.children} />
-                      </div>
-                    );
-                  },
-                }}
-              >
-                {messageItem}
-              </ReactMarkdown>
+            messageHistory.map((messageObject, index) => (
+              <div className="mb-2">
+                <ReactMarkdown
+                  key={index}
+                  className={`prose prose-invert p-4 rounded-xl text-left 
+                  ${messageObject.role === "user" ? "bg-[#444444]" : "bg-none"}`}
+                  remarkPlugins={[remarkGfm, remarkBreaks]}
+                  components={{
+                    pre({ children }) {
+                      return (
+                        <div className="relative rounded-xl">
+                          <pre>{children}</pre>
+                          <CopyButton
+                            text={children.props.children}
+                            className="absolute top-2 right-2 bg-gray-700 text-white rounded hover:bg-gray-600 focus:outline-none"
+                          />
+                        </div>
+                      );
+                    },
+                  }}
+                >
+                  {messageObject.parts[0]}
+                </ReactMarkdown>
+                {messageObject.role === "model" ? (
+                  <CopyButton
+                    text={messageObject.parts[0]}
+                    className="mb-5 ml-4"
+                  />
+                ) : null}
+              </div>
             ))
           ) : (
             <div>No messages yet.</div>
