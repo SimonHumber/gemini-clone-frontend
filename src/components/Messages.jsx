@@ -9,9 +9,8 @@ const Messages = ({ messageHistory, messagesEndRef, className }) => {
     <div className={className}>
       {messageHistory.length > 0 ? (
         messageHistory.map((messageObject, index) => (
-          <div className="mb-2">
+          <div className="mb-2" key={index}>
             <ReactMarkdown
-              key={index}
               className={`prose prose-invert p-4 rounded-xl text-left 
           ${messageObject.role === "user" ? "bg-[#444444]" : "bg-none"}`}
               remarkPlugins={[remarkGfm, remarkBreaks]}

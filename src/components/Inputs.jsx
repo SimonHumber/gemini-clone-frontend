@@ -7,6 +7,8 @@ const Inputs = ({
   handleSubmit,
   setPrompt,
   prompt,
+  socketOn,
+  handleStop,
 }) => {
   return (
     <div className={className}>
@@ -20,17 +22,28 @@ const Inputs = ({
         style={{ resize: "none" }}
         aria-label="Enter prompt here"
       />
-      <button
-        id="send"
-        className={`p-1 ${
-          prompt === "" ? "opacity-20 cursor-default" : "hover:brightness-50"
-        }`}
-        onClick={handleSubmit}
-        disabled={prompt === ""}
-        aria-label="Send message"
-      >
-        <img src={sendArrow} alt="Send" className="w-7 h-7" />
-      </button>
+      {socketOn ? (
+        <button
+          id="stop"
+          className="p-1 text-white"
+          onClick={handleStop}
+          aria-label="Stop Generating Response"
+        >
+          STOP
+        </button>
+      ) : (
+        <button
+          id="send"
+          className={`p-1 ${
+            prompt === "" ? "opacity-20 cursor-default" : "hover:brightness-50"
+          }`}
+          onClick={handleSubmit}
+          disabled={prompt === ""}
+          aria-label="Send message"
+        >
+          <img src={sendArrow} alt="Send" className="w-7 h-7" />
+        </button>
+      )}
     </div>
   );
 };

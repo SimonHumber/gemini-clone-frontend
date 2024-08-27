@@ -7,7 +7,9 @@ import Inputs from "./Inputs";
 const Home = () => {
   const [prompt, setPrompt] = useState("");
   const [messageHistory, setMessageHistory] = useState([]);
+  const [socketOn, setSocketOn] = useState(false);
   const messagesEndRef = useRef(null); // Create a ref for auto scrolling
+  const socketRef = useRef(null);
 
   const handleSubmit = () => {
     console.log(prompt);
@@ -16,35 +18,42 @@ const Home = () => {
 
     try {
       // Create a Socket.IO connection
-      const socket = io("http://localhost:8080");
+      socketRef.current = io("http://localhost:8080");
       setPrompt(""); //clear prompt after sending
 
-      socket.on("connect", () => {
+      socketRef.current.on("connect", () => {
         console.log("Connected to server");
-        socket.send(promptObject); // Sending a prompt
+        setSocketOn(true);
+        socketRef.current.send(promptObject); // Sending a prompt
       });
 
       //custom event, backend emits response
-      socket.on("response", (data) => {
+      socketRef.current.on("response", (data) => {
         console.log("Received:", data);
         var responseObject = { role: "model", parts: [data] };
         setMessageHistory((prevHistory) => [...prevHistory, responseObject]); //append response to message history
-        socket.close(); // Close the connection after receiving the response
+        socketRef.current.close(); // Close the connection after receiving the response
       });
 
       //when socket is closed this will run
-      socket.on("disconnect", () => {
+      socketRef.current.on("disconnect", () => {
+        setSocketOn(false);
+        console.log(socketRef.current);
         console.log("Connection closed");
       });
 
       //if backend is off, this will run
-      socket.on("connect_error", (error) => {
-        socket.close();
+      socketRef.current.on("connect_error", (error) => {
+        socketRef.current.close();
         console.error(error);
       });
     } catch (error) {
       console.error("Error:", error);
     }
+  };
+
+  const handleStop = () => {
+    socketRef.current.close();
   };
 
   const handleEnterKey = (event) => {
@@ -60,22 +69,25 @@ const Home = () => {
   }, [messageHistory]);
 
   return (
-    <div className="font-sans bg-[#212121] flex flex-col items-center h-screen m-0">
-      <div className="p-5gw-full md:w-8/12 lg:w-7/12 h-11/12 flex flex-col mt-3">
-        <header className="w-full text-3xl text-[#dadada] mb-5 text-center pb-5 border-b border-gray-600 m-auto">
+    <div className="font-sans bg-[#212121] flex flex-col items-center h-screen">
+      <div className="w-full md:w-8/12 lg:w-7/12 h-11/12 flex flex-col mt-3">
+        <header className="text-3xl text-[#dadada] mb-5 text-center pb-5 border-b border-gray-600">
           CPAN226CHAT
         </header>
         <Messages
-          className="m-auto h-[75vh] w-full overflow-y-auto mb-2 text-[#d6d6d6] p-2 bg-[#212121]"
+          className="h-[75vh] overflow-y-auto text-[#d6d6d6] p-2 mb-3"
           messageHistory={messageHistory}
           messagesEndRef={messagesEndRef}
         />
         <Inputs
-          className="w-full m-auto flex items-center pt-2 border-t border-[#a5a5a5]"
+          className="flex pt-2 border-t border-[#a5a5a5]"
           handleEnterKey={handleEnterKey}
           handleSubmit={handleSubmit}
           setPrompt={setPrompt}
           prompt={prompt}
+          socketOn={socketOn}
+          socketRef={socketRef}
+          handleStop={handleStop}
         />
       </div>
     </div>
