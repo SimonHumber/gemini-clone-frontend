@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks"; //so that line breaks in prompts show
 import sendArrow from "../assets/sendarrow.png";
 import CopyButton from "./CopyButton";
 import "./styles.css";
@@ -12,6 +13,7 @@ const Home = () => {
   const messagesEndRef = useRef(null); // Create a ref for scrolling
 
   const handleSubmit = () => {
+    console.log(prompt);
     setMessageHistory([...messageHistory, prompt]);
 
     try {
@@ -30,6 +32,7 @@ const Home = () => {
         socket.close(); // Close the connection after receiving the response
       });
 
+      //when socket is closed this will run
       socket.on("disconnect", () => {
         console.log("Connection closed");
       });
@@ -59,7 +62,7 @@ const Home = () => {
   return (
     <div className="font-sans bg-[#212121] flex flex-col items-center h-screen m-0">
       {/* sidebar here */}
-      <div className="p-5 w-7/12 h-11/12 flex flex-col ">
+      <div className="p-5 w-full md:w-8/12 lg:w-7/12 h-11/12 flex flex-col ">
         <header className="w-full text-3xl text-[#dadada] mb-5 text-center pb-10 border-b border-gray-600 m-auto">
           CPAN226CHAT
         </header>
@@ -69,16 +72,14 @@ const Home = () => {
               <ReactMarkdown
                 key={index}
                 className="prose prose-invert mb-2 ml-auto mr-auto p-4 rounded-xl bg-[#121212] text-left"
-                remarkPlugins={[remarkGfm]}
+                remarkPlugins={[remarkGfm, remarkBreaks]}
                 components={{
                   pre({ children }) {
                     //TODO put a title above codeblock
                     return (
                       <div className="relative rounded-xl">
                         <pre>{children}</pre>
-                        <CopyButton
-                          text={children[0]?.props?.children?.[0] || ""}
-                        />
+                        <CopyButton text={children.props.children} />
                       </div>
                     );
                   },
