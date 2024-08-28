@@ -11,8 +11,8 @@ const Messages = ({ messageHistory, messagesEndRef, className }) => {
         messageHistory.map((messageObject, index) => (
           <div className="mb-2" key={index}>
             <ReactMarkdown
-              className={`prose prose-invert p-4 rounded-xl text-left 
-          ${messageObject.role === "user" ? "bg-[#444444]" : "bg-none"}`}
+              className={`prose prose-invert p-4 rounded-xl break-words overflow-wrap-anywhere
+          ${messageObject.role === "user" ? "bg-[#444444] w-fit ml-auto" : "bg-none text-left"}`}
               remarkPlugins={[remarkGfm, remarkBreaks]}
               components={{
                 pre({ children }) {
@@ -21,7 +21,7 @@ const Messages = ({ messageHistory, messagesEndRef, className }) => {
                       <pre>{children}</pre>
                       <CopyButton
                         text={children.props.children}
-                        className="absolute top-2 right-2 bg-gray-700 text-white rounded hover:bg-gray-600 focus:outline-none"
+                        className="absolute top-2 right-2"
                       />
                     </div>
                   );
