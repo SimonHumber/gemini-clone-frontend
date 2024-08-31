@@ -5,16 +5,19 @@ import Messages from "./Messages";
 import Inputs from "./Inputs";
 
 const Home = () => {
-  const [prompt, setPrompt] = useState("");
   const [messageHistory, setMessageHistory] = useState([]);
   const [socketOn, setSocketOn] = useState(false);
   const [file, setFile] = useState(null);
+  const promptRef = useRef("");
   const messagesEndRef = useRef(null); // Create a ref for auto scrolling
   const socketRef = useRef(null);
 
   const handleSubmit = async () => {
-    console.log(prompt);
-    var promptObject = { role: "user", parts: [prompt], hasFiles: false };
+    var promptObject = {
+      role: "user",
+      parts: [promptRef.current],
+      hasFiles: false,
+    };
     file && (promptObject.hasFiles = true);
     setMessageHistory([...messageHistory, promptObject]);
     if (file) {
@@ -25,7 +28,7 @@ const Home = () => {
         body: formData,
       });
     }
-    setPrompt("");
+    promptRef.current = "";
     setFile(null);
 
     try {
@@ -97,13 +100,12 @@ const Home = () => {
           className="flex pt-2 border-t border-[#a5a5a5]"
           handleEnterKey={handleEnterKey}
           handleSubmit={handleSubmit}
-          setPrompt={setPrompt}
-          prompt={prompt}
           socketOn={socketOn}
           socketRef={socketRef}
           handleStop={handleStop}
           setFile={setFile}
           handleUpload={handleUpload}
+          promptRef={promptRef}
         />
       </div>
     </div>
