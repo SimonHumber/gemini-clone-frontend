@@ -8,6 +8,7 @@ const Home = () => {
   const [prompt, setPrompt] = useState("");
   const [messageHistory, setMessageHistory] = useState([]);
   const [socketOn, setSocketOn] = useState(false);
+  const [file, setFile] = useState(null);
   const messagesEndRef = useRef(null); // Create a ref for auto scrolling
   const socketRef = useRef(null);
 
@@ -19,7 +20,9 @@ const Home = () => {
     try {
       // Create a Socket.IO connection
       socketRef.current = io("http://localhost:8080");
-      setPrompt(""); //clear prompt after sending
+      console.log(file);
+      setPrompt("");
+      setFile("");
 
       socketRef.current.on("connect", () => {
         console.log("Connected to server");
@@ -63,6 +66,10 @@ const Home = () => {
     }
   };
 
+  const handleUpload = (e) => {
+    setFile(e.target.files[0]);
+  };
+
   useEffect(() => {
     // Scroll to bottom whenever messageHistory changes
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -88,6 +95,8 @@ const Home = () => {
           socketOn={socketOn}
           socketRef={socketRef}
           handleStop={handleStop}
+          setFile={setFile}
+          handleUpload={handleUpload}
         />
       </div>
     </div>

@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import sendArrow from "../assets/sendarrow.png";
+import { IoIosAttach } from "react-icons/io";
 
 const Inputs = ({
   className,
@@ -9,7 +10,14 @@ const Inputs = ({
   prompt,
   socketOn,
   handleStop,
+  handleUpload,
 }) => {
+  const fileInputRef = useRef(null);
+
+  const triggerFileInput = () => {
+    fileInputRef.current.click();
+  };
+
   return (
     <div className={className}>
       <textarea
@@ -22,6 +30,15 @@ const Inputs = ({
         style={{ resize: "none" }}
         aria-label="Enter prompt here"
       />
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleUpload}
+        className="hidden"
+      />
+      <button onClick={triggerFileInput}>
+        <IoIosAttach className="w-7 h-7 ml-2 mr-2" color="white" />
+      </button>
       {socketOn ? (
         <button
           id="stop"
