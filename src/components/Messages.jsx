@@ -3,6 +3,8 @@ import CopyButton from "./CopyButton";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
+import rehypePrism from "@mapbox/rehype-prism";
+import "prismjs/themes/prism-tomorrow.css";
 
 const Messages = ({ messageHistory, messagesEndRef, className }) => {
   return (
@@ -14,6 +16,7 @@ const Messages = ({ messageHistory, messagesEndRef, className }) => {
               className={`prose prose-invert p-4 rounded-xl break-words overflow-wrap-anywhere
           ${messageObject.role === "user" ? "bg-[#444444] w-fit ml-auto" : "bg-none text-left"}`}
               remarkPlugins={[remarkGfm, remarkBreaks]}
+              rehypePlugins={[rehypePrism]}
               components={{
                 pre({ children }) {
                   return (

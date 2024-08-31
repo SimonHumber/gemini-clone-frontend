@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import sendArrow from "../assets/sendarrow.png";
 import { IoIosAttach } from "react-icons/io";
 
