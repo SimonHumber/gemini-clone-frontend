@@ -12,17 +12,25 @@ const Home = () => {
   const messagesEndRef = useRef(null); // Create a ref for auto scrolling
   const socketRef = useRef(null);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log(prompt);
-    var promptObject = { role: "user", parts: [prompt] };
+    var promptObject = { role: "user", parts: [prompt], hasFiles: false };
+    file && (promptObject.hasFiles = true);
     setMessageHistory([...messageHistory, promptObject]);
+    if (file) {
+      var formData = new FormData();
+      formData.append("file", file);
+      await fetch("http://localhost:8080/upload", {
+        method: "POST",
+        body: formData,
+      });
+    }
+    setPrompt("");
+    setFile(null);
 
     try {
       // Create a Socket.IO connection
       socketRef.current = io("http://localhost:8080");
-      console.log(file);
-      setPrompt("");
-      setFile("");
 
       socketRef.current.on("connect", () => {
         console.log("Connected to server");
@@ -41,7 +49,6 @@ const Home = () => {
       //when socket is closed this will run
       socketRef.current.on("disconnect", () => {
         setSocketOn(false);
-        console.log(socketRef.current);
         console.log("Connection closed");
       });
 
