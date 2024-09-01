@@ -43,6 +43,7 @@ const Inputs = ({
         ref={fileInputRef}
         onChange={handleUpload}
         className="hidden"
+        multiple
       />
       <button onClick={triggerFileInput}>
         <IoIosAttach className="w-7 h-7 ml-2 mr-2" color="white" />
