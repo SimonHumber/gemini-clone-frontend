@@ -1,4 +1,4 @@
-import React from "react";
+import { React, isValidElement } from "react";
 import CopyButton from "./CopyButton";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -19,11 +19,26 @@ const Messages = ({ messageHistory, messagesEndRef, className }) => {
               rehypePlugins={[rehypePrism]}
               components={{
                 pre({ children }) {
+                  const extractText = (child) => {
+                    if (typeof child === "string") {
+                      return child;
+                    }
+                    if (isValidElement(child)) {
+                      return extractText(child.props.children);
+                    }
+                    if (Array.isArray(child)) {
+                      return child.map(extractText).join("");
+                    }
+                    return "";
+                  };
+
+                  const codeText = extractText(children);
+
                   return (
                     <div className="relative rounded-xl">
                       <pre>{children}</pre>
                       <CopyButton
-                        text={children.props.children}
+                        text={codeText}
                         className="absolute top-2 right-2"
                       />
                     </div>
