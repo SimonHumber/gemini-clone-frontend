@@ -28,6 +28,7 @@ const Inputs = ({
   handleStop,
   handleUpload,
   promptRef,
+  files,
 }) => {
   const fileInputRef = useRef(null);
 
@@ -61,7 +62,7 @@ const Inputs = ({
         <button
           id="send"
           className={`p-1 ${
-            promptRef === ""
+            promptRef === "" || files.length == 0
               ? "opacity-20 cursor-default"
               : "hover:brightness-50"
           }`}

@@ -7,7 +7,7 @@ import Inputs from "./Inputs";
 const Home = () => {
   const [messageHistory, setMessageHistory] = useState([]);
   const [socketOn, setSocketOn] = useState(false);
-  const [file, setFile] = useState([]);
+  const [files, setFiles] = useState([]);
   const promptRef = useRef("");
   const messagesEndRef = useRef(null); // Create a ref for auto scrolling
   const socketRef = useRef(null);
@@ -18,12 +18,12 @@ const Home = () => {
       parts: [promptRef.current],
       hasFiles: false,
     };
-    file.length > 1 && (promptObject.hasFiles = true);
+    files.length > 0 && (promptObject.hasFiles = true);
     setMessageHistory([...messageHistory, promptObject]);
-    if (file.length > 0) {
+    if (files.length > 0) {
       var formData = new FormData();
-      for (let i = 0; i < file.length; i++) {
-        formData.append("file", file[i]);
+      for (let i = 0; i < files.length; i++) {
+        formData.append("file", files[i]);
       }
       await fetch("http://localhost:8080/upload", {
         method: "POST",
@@ -31,7 +31,7 @@ const Home = () => {
       });
     }
     promptRef.current = "";
-    setFile([]);
+    setFiles([]);
 
     try {
       // Create a Socket.IO connection
@@ -79,7 +79,7 @@ const Home = () => {
   };
 
   const handleUpload = (e) => {
-    setFile(e.target.files);
+    setFiles(e.target.files);
   };
 
   useEffect(() => {
@@ -105,9 +105,10 @@ const Home = () => {
           socketOn={socketOn}
           socketRef={socketRef}
           handleStop={handleStop}
-          setFile={setFile}
+          setFile={setFiles}
           handleUpload={handleUpload}
           promptRef={promptRef}
+          files={files}
         />
       </div>
     </div>
