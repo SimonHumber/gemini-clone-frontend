@@ -36,11 +36,20 @@ const Inputs = ({
     fileInputRef.current.click();
   };
 
+  //refer to api documentation if they ever add more file support
+  const imageFiles = ".png, .jpg, .jpeg, .webp, .heic, .heif";
+  const videoFiles = ".mp4, .mpg, .mpeg, .mov, .avi, .flv, .webm, .wmv, .3gp";
+  const audioFiles = ".wav, .mp3, .aiff, .aif, .aac, .ogg, .flac";
+  const docFiles = ".pdf";
+  const acceptedFiles =
+    videoFiles + ", " + imageFiles + ", " + audioFiles + ", " + docFiles;
+
   return (
     <div className={className}>
       <TextArea promptRef={promptRef} handleEnterKey={handleEnterKey} />
       <input
         type="file"
+        accept={acceptedFiles}
         ref={fileInputRef}
         onChange={handleUpload}
         className="hidden"
