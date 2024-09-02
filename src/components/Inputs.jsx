@@ -2,35 +2,33 @@ import React, { useRef, useState, useEffect } from "react";
 import sendArrow from "../assets/sendarrow.png";
 import { IoIosAttach } from "react-icons/io";
 
-const TextArea = ({ promptRef, handleEnterKey }) => {
+const TextArea = ({ promptRef, handleEnterKey, className, handleSubmit }) => {
   const [prompt, setPrompt] = useState("");
   const textAreaRef = useRef(null);
 
   useEffect(() => {
-    const textarea = textAreaRef.current;
-
     // Reset height to auto so that it shrinks when needed
-    textarea.style.height = "auto";
+    textAreaRef.current.style.height = "auto";
 
     // Calculate the height for 4 rows of text (approximate)
     const lineHeight = parseInt(
-      window.getComputedStyle(textarea).lineHeight,
+      window.getComputedStyle(textAreaRef.current).lineHeight,
       10,
     );
     const maxHeight = lineHeight * 4; // Height for 4 rows
 
     // Set height to scrollHeight to adjust the height based on content
-    textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
+    textAreaRef.current.style.height = `${Math.min(textAreaRef.current.scrollHeight, maxHeight)}px`;
 
     // Set a maxHeight to ensure it doesn't grow beyond 4 rows
-    textarea.style.overflowY =
-      textarea.scrollHeight > maxHeight ? "auto" : "hidden";
-  }, [prompt]);
+    textAreaRef.current.style.overflowY =
+      textAreaRef.current.scrollHeight > maxHeight ? "auto" : "hidden";
+  }, [prompt, handleSubmit]);
 
   return (
     <textarea
       ref={textAreaRef}
-      className="w-full p-2 pl-5 mr-1 bg-[#121212] text-[#fbfbfb] text-xl rounded-3xl resize-none"
+      className={className}
       placeholder="Ask ChatGPT..."
       value={promptRef.current}
       onChange={(event) => {
@@ -53,6 +51,7 @@ const Inputs = ({
   handleUpload,
   promptRef,
   files,
+  filePreview,
 }) => {
   const fileInputRef = useRef(null);
 
@@ -70,7 +69,19 @@ const Inputs = ({
 
   return (
     <div className={className}>
-      <TextArea promptRef={promptRef} handleEnterKey={handleEnterKey} />
+      <div className="flex flex-col w-full">
+        <div className="flex">
+          {filePreview.map((file, index) => (
+            <img src={file} className="w-10 h-10" />
+          ))}
+        </div>
+        <TextArea
+          promptRef={promptRef}
+          handleEnterKey={handleEnterKey}
+          handleSubmit={handleSubmit}
+          className="p-2 pl-5 mt-3 mr-1 bg-[#121212] text-[#fbfbfb] text-xl rounded-3xl resize-none"
+        />
+      </div>
       <input
         type="file"
         accept={acceptedFiles}
@@ -95,7 +106,7 @@ const Inputs = ({
         <button
           id="send"
           className={`p-1 ${
-            promptRef === "" || files.length == 0
+            promptRef === "" || files.length === 0
               ? "opacity-20 cursor-default"
               : "hover:brightness-50"
           }`}

@@ -8,6 +8,7 @@ const Home = () => {
   const [messageHistory, setMessageHistory] = useState([]);
   const [socketOn, setSocketOn] = useState(false);
   const [files, setFiles] = useState([]);
+  const [filePreview, setFilePreview] = useState([]);
   const promptRef = useRef("");
   const messagesEndRef = useRef(null); // Create a ref for auto scrolling
   const socketRef = useRef(null);
@@ -32,6 +33,7 @@ const Home = () => {
     }
     promptRef.current = "";
     setFiles([]);
+    setFilePreview([]);
 
     try {
       // Create a Socket.IO connection
@@ -79,7 +81,15 @@ const Home = () => {
   };
 
   const handleUpload = (e) => {
-    setFiles(e.target.files);
+    const uploadedFiles = Array.from(e.target.files); // Convert FileList to array
+    setFiles(Array.from(e.target.files));
+    uploadedFiles.forEach((file) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (readerEvent) => {
+        setFilePreview((arr) => [...arr, readerEvent.target.result]);
+      };
+    });
   };
 
   useEffect(() => {
@@ -89,17 +99,17 @@ const Home = () => {
 
   return (
     <div className="font-sans bg-[#212121] flex flex-col items-center h-screen">
-      <div className="w-full md:w-8/12 lg:w-7/12 h-11/12 flex flex-col mt-3">
-        <header className="text-3xl text-[#dadada] mb-5 text-center pb-5 border-b border-gray-600">
+      <div className="h-full w-full md:w-8/12 lg:w-7/12 h-11/12 flex flex-col">
+        <header className="mt-3 text-3xl text-[#dadada] mb-5 text-center pb-5 border-b border-gray-600">
           CPAN226CHAT
         </header>
         <Messages
-          className="h-[75vh] overflow-y-auto text-[#d6d6d6] p-2 mb-3"
+          className="h-full overflow-y-auto text-[#d6d6d6] p-2 mb-3"
           messageHistory={messageHistory}
           messagesEndRef={messagesEndRef}
         />
         <Inputs
-          className="flex pt-2 border-t border-[#a5a5a5]"
+          className="flex pt-2 border-t border-[#a5a5a5] mb-5"
           handleEnterKey={handleEnterKey}
           handleSubmit={handleSubmit}
           socketOn={socketOn}
@@ -109,6 +119,7 @@ const Home = () => {
           handleUpload={handleUpload}
           promptRef={promptRef}
           files={files}
+          filePreview={filePreview}
         />
       </div>
     </div>
