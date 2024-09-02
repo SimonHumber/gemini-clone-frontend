@@ -1,12 +1,36 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import sendArrow from "../assets/sendarrow.png";
 import { IoIosAttach } from "react-icons/io";
 
 const TextArea = ({ promptRef, handleEnterKey }) => {
   const [prompt, setPrompt] = useState("");
+  const textAreaRef = useRef(null);
+
+  useEffect(() => {
+    const textarea = textAreaRef.current;
+
+    // Reset height to auto so that it shrinks when needed
+    textarea.style.height = "auto";
+
+    // Calculate the height for 4 rows of text (approximate)
+    const lineHeight = parseInt(
+      window.getComputedStyle(textarea).lineHeight,
+      10,
+    );
+    const maxHeight = lineHeight * 4; // Height for 4 rows
+
+    // Set height to scrollHeight to adjust the height based on content
+    textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
+
+    // Set a maxHeight to ensure it doesn't grow beyond 4 rows
+    textarea.style.overflowY =
+      textarea.scrollHeight > maxHeight ? "auto" : "hidden";
+  }, [prompt]);
+
   return (
     <textarea
-      className="w-full p-2 pl-5 mr-1 bg-[#121212] text-[#fbfbfb] text-xl rounded-full"
+      ref={textAreaRef}
+      className="w-full p-2 pl-5 mr-1 bg-[#121212] text-[#fbfbfb] text-xl rounded-3xl resize-none"
       placeholder="Ask ChatGPT..."
       value={promptRef.current}
       onChange={(event) => {
@@ -14,9 +38,9 @@ const TextArea = ({ promptRef, handleEnterKey }) => {
         setPrompt(event.target.value);
       }}
       onKeyDown={handleEnterKey}
-      rows="2"
       style={{ resize: "none" }}
       aria-label="Enter prompt here"
+      rows="1"
     />
   );
 };
@@ -52,10 +76,10 @@ const Inputs = ({
         accept={acceptedFiles}
         ref={fileInputRef}
         onChange={handleUpload}
-        className="hidden"
+        hidden
         multiple
       />
-      <button onClick={triggerFileInput}>
+      <button onClick={triggerFileInput} aria-label="Upload file">
         <IoIosAttach className="w-7 h-7 ml-2 mr-2" color="white" />
       </button>
       {socketOn ? (
@@ -79,7 +103,12 @@ const Inputs = ({
           disabled={promptRef === ""}
           aria-label="Send message"
         >
-          <img src={sendArrow} alt="Send" className="w-7 h-7" />
+          <img
+            src={sendArrow}
+            alt="Send"
+            className="w-7 h-7"
+            aria-label="Send prompt"
+          />
         </button>
       )}
     </div>
